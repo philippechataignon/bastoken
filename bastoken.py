@@ -158,7 +158,7 @@ def main(argv):
         with open(argv[2], "wb") as output:
             for c in tokenize_program(input.readlines()):
                 output.write(bytes([c]))
-
+            output.write(bytes([0]))
 
 if __name__ == "__main__":
     main(sys.argv)
