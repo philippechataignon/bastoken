@@ -1,11 +1,10 @@
+#!/usr/bin/env python3
 """Tokenizes an AppleSoft BASIC program into memory representation.
 
 See http://www.txbobsc.com/scsc/scdocumentor/D52C.html for original source.
 
 TODO: add tests
 """
-
-import sys
 
 TOKENS = {}
 
@@ -30,22 +29,26 @@ def tokenize_program(lines):
 
     addr = 0x801
     for line in lines:
+        # Skip lines that entirely consist of other whitespace,
+        # though we want to keep this for actual program lines
         if not line.strip():
-            # Skip lines that entirely consist of other whitespace,
-            # though we want to keep this for actual program lines
+            continue
+        # ignore line beginning with '#'
+        if line[0] == "#":
             continue
         linenum, tokenized = tokenize_line(line.rstrip("\n\r"))
         tokenized = list(tokenized)
         addr += len(tokenized) + 4
         # Starting address of next program line (or EOF)
-        yield addr % 256
-        yield int(addr / 256)
+        yield addr & 0xff
+        yield addr >> 8 & 0xff
         # Line number
-        yield linenum % 256
-        yield int(linenum / 256)
+        yield linenum & 0xff
+        yield linenum >> 8 & 0xff
         # Statement body
         yield from tokenized
-    # No more lines
+    # No more lines : three 0 at the end
+    yield 0x00
     yield 0x00
     yield 0x00
 
