@@ -153,15 +153,17 @@ def read_token(line: str, idx: int):
             return [ord("A"), TOKENS["TO"]], lookahead_idx + 2
     return [TOKENS[token]], lookahead_idx + 1
 
-def main(argv):
-    if len(argv) < 2:
-        print("Usage: %s <input> <output>", sys.stderr)
-        sys.exit(1)
-    with open(argv[1], "r") as input:
-        with open(argv[2], "wb") as output:
-            for c in tokenize_program(input.readlines()):
-                output.write(bytes([c]))
-            output.write(bytes([0]))
+def main():
+    import sys
+    if len(sys.argv) < 3 or sys.argv[2] == "-":
+        outfile = sys.stdout
+    else:
+        outfile = open(sys.argv[2], "wb")
+    if len(sys.argv) < 2 or sys.argv[1] == "-":
+        infile = sys.stdin
+    else:
+        infile = open(sys.argv[1], "r")
+    outfile.buffer.write(bytes([c for c in tokenize_program(infile)]))
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
